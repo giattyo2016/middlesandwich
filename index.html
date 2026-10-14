@@ -16,10 +16,10 @@
         .category-box { width: 30%; height: 60px; border: 1px solid #999; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; }
         .category-box.selected { background-color: #ddd; font-weight: bold; }
         
-        /* 排序功能 */
         .sort-bar { text-align: right; margin-bottom: 15px; color: #1976d2; font-size: 14px; cursor: pointer; font-weight: bold; user-select: none; }
         
         .restaurant-list { display: flex; flex-direction: column; gap: 15px; }
+        /* 初期状態ですべての店舗を表示（display: flex） */
         .restaurant-card { border: 1px solid #999; border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
         
         /* 畫面2: 目前 12:00 */
@@ -43,23 +43,22 @@
         .big-time { font-size: 32px; font-weight: bold; margin-top: 30px; }
         .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 24px; border-bottom: 2px solid #333; cursor: pointer; user-select: none; padding-bottom: 5px; }
         
-        /* 畫面3: 預訂 (包含商品資訊展開動畫) */
-        .menu-container { border-bottom: 1px solid #eee; }
+        /* 畫面3: 預訂 */
+        .menu-item-group { border-bottom: 1px solid #eee; }
         .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
         .checkbox-container { display: flex; align-items: center; cursor: pointer; flex-grow: 1; }
         .custom-checkbox { width: 24px; height: 24px; border: 2px solid #666; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; font-size: 18px; color: transparent; transition: 0.2s; }
         .custom-checkbox.checked { color: #333; }
         .menu-name { margin-left: 15px; font-size: 18px; }
-        .plus-btn { font-size: 24px; color: #666; cursor: pointer; user-select: none; padding: 0 15px; width: 20px; text-align: center; }
+        .plus-btn { font-size: 24px; color: #666; cursor: pointer; user-select: none; padding: 0 15px; }
         
-        /* 隱藏的商品資訊 (動態展開) */
-        .menu-info { max-height: 0; overflow: hidden; transition: all 0.3s ease-out; background: #fafafa; color: #555; font-size: 14px; padding: 0 15px; border-radius: 5px; }
-        .menu-info.show { max-height: 150px; padding: 10px 15px; margin-bottom: 10px; border: 1px solid #ddd; }
+        /* +按鈕展開的動畫資訊 */
+        .menu-info { max-height: 0; overflow: hidden; opacity: 0; background-color: #fafafa; color: #555; font-size: 14px; transition: all 0.3s ease; padding: 0 15px; border-radius: 0 0 8px 8px; }
+        .menu-info.show { max-height: 100px; opacity: 1; padding: 10px 15px 15px 15px; border-bottom: 1px solid #ddd; margin-bottom: 10px; }
         
         .next-btn-circle { position: absolute; bottom: 30px; right: 20px; width: 50px; height: 50px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; background: #fff; user-select: none; }
         
-        /* 畫面4: 取餐時間與付款 */
-        /* 購物籃插圖 (CSS繪製) */
+        /* 畫面4: 取餐時間 */
         .basket-illustration { width: 120px; height: 100px; margin: 30px auto; position: relative; }
         .basket-handle-left { position: absolute; width: 2px; height: 35px; background: #333; top: 0; left: 30px; transform: rotate(-25deg); }
         .basket-handle-right { position: absolute; width: 2px; height: 35px; background: #333; top: 0; right: 30px; transform: rotate(25deg); }
@@ -69,15 +68,15 @@
         .basket-line-v1 { position: absolute; width: 2px; height: 100%; background: #333; left: 33%; }
         .basket-line-v2 { position: absolute; width: 2px; height: 100%; background: #333; left: 66%; }
         
-        /* 自訂下拉選單 (附 ∨ 圖示，上下文字完美置中) */
+        /* 時間下拉選單與付款方式的統一外框 */
         .time-select-wrapper { position: relative; width: 80%; margin: 20px auto; }
         .time-select { 
             width: 100%; 
-            padding: 10px; 
+            padding: 10px 0; 
             font-size: 20px; 
             border: 2px solid #333; 
             text-align: center; 
-            text-align-last: center; /* 讓選中的文字置中 */
+            text-align-last: center; /* 讓下拉清單與選中文字置中對齊 */
             background: #fff; 
             appearance: none; 
             -webkit-appearance: none; 
@@ -85,30 +84,18 @@
             cursor: pointer;
             box-sizing: border-box;
         }
-        .time-select option { text-align: center; } /* 讓展開後的選項也置中 */
+        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #333; font-family: monospace; }
         
-        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #333; }
-        
-        /* 付款方式外框 (與時間選擇同寬同框) */
-        .pay-box {
-            width: 80%;
-            margin: 20px auto;
-            border: 2px solid #333;
-            padding: 15px 10px;
-            box-sizing: border-box;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .pay-box label { display: flex; align-items: center; cursor: pointer; font-size: 16px; margin: 5px 0;}
+        /* 與上方時間選單等寬的外框 */
+        .pay-container { width: 80%; margin: 0 auto 40px auto; border: 2px solid #333; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; background: #fff; }
+        .pay-container-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
+        .pay-container label { font-size: 18px; cursor: pointer; display: flex; align-items: center; }
+        .pay-container input { margin-right: 12px; transform: scale(1.2); }
         
         /* 畫面5: 已送出 */
         .success-title { font-size: 28px; margin-bottom: 30px; margin-top: 20px; }
         .details { font-size: 18px; line-height: 2; margin-bottom: 40px; }
         
-        /* 櫃檯插圖 (CSS繪製) */
         .counter-illustration { width: 180px; height: 120px; margin: 40px auto; position: relative; }
         .counter-sign { position: absolute; width: 140px; height: 20px; border: 2px solid #333; top: 0; left: 20px; }
         .counter-person-head { position: absolute; width: 24px; height: 24px; border: 2px solid #333; border-radius: 50%; top: 35px; left: 78px; }
@@ -119,7 +106,7 @@
         
         .home-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; border: 1px solid #333; padding: 10px 30px; border-radius: 8px; user-select: none; white-space: nowrap; }
         
-        /* 提示動畫 (Motion) */
+        /* 提示動畫 */
         .notification { position: absolute; top: 20px; right: -350px; background: #fff9c4; border: 1px solid #fbc02d; padding: 15px; border-radius: 8px 0 0 8px; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100; font-size: 16px; font-weight: bold; color: #333; }
         .notification.show { right: 0; }
     </style>
@@ -127,7 +114,6 @@
 <body>
     <div class="app">
         
-        <!-- 動畫提示框 -->
         <div id="toast" class="notification">
             已預約，請於 <span id="toast-time">12:40</span> 取餐！
         </div>
@@ -143,28 +129,25 @@
             
             <div class="sort-bar" onclick="sortRestaurants()">↓ 等候時間由少到多</div>
             
-            <!-- 初始會顯示所有店家 -->
             <div class="restaurant-list" id="restaurant-list">
                 <div class="restaurant-card" data-category="rice" data-time="20" onclick="goToDetail('店1', '20')">
-                    <span>店1 (飯)</span>
+                    <span>店1</span>
                     <span>20 min</span>
                 </div>
                 <div class="restaurant-card" data-category="rice" data-time="30" onclick="goToDetail('店2', '30')">
-                    <span>店2 (飯)</span>
+                    <span>店2</span>
                     <span>30 min</span>
                 </div>
-                
                 <div class="restaurant-card" data-category="noodle" data-time="15" onclick="goToDetail('麵店A', '15')">
-                    <span>麵店A (麵)</span>
+                    <span>麵店A</span>
                     <span>15 min</span>
                 </div>
                 <div class="restaurant-card" data-category="noodle" data-time="25" onclick="goToDetail('麵店B', '25')">
-                    <span>麵店B (麵)</span>
+                    <span>麵店B</span>
                     <span>25 min</span>
                 </div>
-                
                 <div class="restaurant-card" data-category="drink" data-time="5" onclick="goToDetail('飲料店', '5')">
-                    <span>飲料店 (飲)</span>
+                    <span>飲料店</span>
                     <span>5 min</span>
                 </div>
             </div>
@@ -175,7 +158,6 @@
             <div class="back-btn" onclick="goTo('screen1')">&lt; 目前 12:00</div>
             <div style="margin-left: 20px;">🚶🚶🚶...</div>
             <div class="center-content">
-                <!-- CSS畫的平底鍋 -->
                 <div class="pan-illustration">
                     <div class="pan-steam1">S</div>
                     <div class="pan-steam2">S</div>
@@ -184,7 +166,6 @@
                     <div class="pan-food"></div>
                     <div class="pan-food2"></div>
                 </div>
-                
                 <div class="big-time" id="detail-wait-time">20分鐘...</div>
             </div>
             <div class="bottom-btn" onclick="goTo('screen3')">訂餐</div>
@@ -202,47 +183,37 @@
             </div>
             <div style="border: 2px solid #333; display: inline-block; padding: 2px 5px; margin-bottom: 20px;">✔ 預訂</div>
             
-            <!-- 料理1 -->
-            <div class="menu-container">
+            <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
                         <div class="menu-name">料理1</div>
                     </div>
-                    <!-- 點擊加號展開資訊 -->
-                    <div class="plus-btn" onclick="toggleInfo(this)">+</div>
+                    <div class="plus-btn" onclick="toggleInfo('info1')">+</div>
                 </div>
-                <div class="menu-info">
-                    這是一份美味的招牌餐點，包含豐富的營養成分，是學生的最愛！
-                </div>
+                <div id="info1" class="menu-info">這是一份美味的餐點，快速且營養豐富。</div>
             </div>
 
-            <!-- 料理2 -->
-            <div class="menu-container">
+            <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
                         <div class="menu-name">料理2</div>
                     </div>
-                    <div class="plus-btn" onclick="toggleInfo(this)">+</div>
+                    <div class="plus-btn" onclick="toggleInfo('info2')">+</div>
                 </div>
-                <div class="menu-info">
-                    特製香料醃製，外酥內嫩，份量十足，絕對讓你吃得飽滿！
-                </div>
+                <div id="info2" class="menu-info">經典口味，份量充足，學生最愛推薦。</div>
             </div>
 
-            <!-- 料理3 -->
-            <div class="menu-container">
+            <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
                         <div class="menu-name">料理3</div>
                     </div>
-                    <div class="plus-btn" onclick="toggleInfo(this)">+</div>
+                    <div class="plus-btn" onclick="toggleInfo('info3')">+</div>
                 </div>
-                <div class="menu-info">
-                    清爽解膩的首選，健康低卡，適合中午不想吃太油膩的你。
-                </div>
+                <div id="info3" class="menu-info">輕食選擇，適合不想吃太飽的午後時光。</div>
             </div>
             
             <div class="next-btn-circle" onclick="goTo('screen4')">→</div>
@@ -250,7 +221,6 @@
 
         <!-- 畫面4: 取餐時間 -->
         <div id="screen4" class="screen">
-            <!-- CSS畫的購物籃 -->
             <div class="basket-illustration">
                 <div class="basket-handle-left"></div>
                 <div class="basket-handle-right"></div>
@@ -262,138 +232,9 @@
                 </div>
             </div>
             
-            <div class="title" style="border: none; margin-bottom: 10px;">取餐時間？</div>
+            <div class="title" style="border: none;">取餐時間？</div>
             
-            <!-- 自訂外觀的下拉選單 -->
             <div class="time-select-wrapper">
                 <select class="time-select" id="pickup-time">
                     <option value="12:40">12 : 40</option>
-                    <option value="12:50" selected>12 : 50</option>
-                    <option value="13:00">13 : 00</option>
-                </select>
-                <div class="time-select-icon">∨</div>
-            </div>
-            
-            <!-- 現金與信用卡選單 (與時間外框大小相同) -->
-            <div class="pay-box">
-                <span style="font-size: 20px; font-weight: bold;">$</span>
-                <label><input type="radio" name="pay" checked> 現金</label>
-                <label><input type="radio" name="pay"> Line pay</label>
-                <label><input type="radio" name="pay"> 信用卡</label>
-            </div>
-            
-            <div class="next-btn-circle" onclick="submitOrder()">→</div>
-        </div>
-
-        <!-- 畫面5: 已送出 -->
-        <div id="screen5" class="screen">
-            <div class="success-title">已送出 ✔</div>
-            <div class="details">
-                - 取餐 <span id="final-time">12:50</span><br>
-                - Line pay (已付款)
-            </div>
-            
-            <!-- CSS畫的櫃檯 -->
-            <div class="counter-illustration">
-                <div class="counter-sign"></div>
-                <div class="counter-person-head"></div>
-                <div class="counter-person-body"></div>
-                <div class="counter-person-arm"></div>
-                <div class="counter-table"></div>
-                <div class="counter-dots">...</div>
-            </div>
-            
-            <div class="home-btn" onclick="returnHome()">回首頁</div>
-        </div>
-    </div>
-
-    <script>
-        // 切換分類顯示店家
-        function filterMenu(category, btnElement) {
-            // 如果點擊的是已經選中的按鈕，則取消選中並顯示全部
-            if (btnElement.classList.contains('selected')) {
-                btnElement.classList.remove('selected');
-                document.querySelectorAll('.restaurant-card').forEach(card => card.style.display = 'flex');
-            } else {
-                document.querySelectorAll('.category-box').forEach(btn => btn.classList.remove('selected'));
-                btnElement.classList.add('selected');
-                
-                document.querySelectorAll('.restaurant-card').forEach(card => {
-                    if(card.getAttribute('data-category') === category) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-        }
-
-        // 排序店家 (等候時間由少到多)
-        function sortRestaurants() {
-            const list = document.getElementById('restaurant-list');
-            const cards = Array.from(list.querySelectorAll('.restaurant-card'));
-            
-            // 依照 data-time 屬性排序
-            cards.sort((a, b) => parseInt(a.getAttribute('data-time')) - parseInt(b.getAttribute('data-time')));
-            
-            // 重新加入 DOM 即可改變順序
-            cards.forEach(card => list.appendChild(card));
-        }
-
-        // 畫面切換通用函數
-        function goTo(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo(0, 0); // 切換畫面時回到頂部
-        }
-
-        // 點擊店家進入詳細畫面
-        function goToDetail(name, time) {
-            document.getElementById('detail-wait-time').innerText = time + '分鐘...';
-            goTo('screen2');
-        }
-
-        // 畫面3: 勾選框切換 (不跳轉畫面)
-        function toggleCheck(container) {
-            const checkbox = container.querySelector('.custom-checkbox');
-            checkbox.classList.toggle('checked');
-        }
-
-        // 畫面3: 點擊 + 展開動畫商品資訊
-        function toggleInfo(btn) {
-            const infoDiv = btn.parentElement.nextElementSibling;
-            if (infoDiv.classList.contains('show')) {
-                infoDiv.classList.remove('show');
-                btn.innerText = '+';
-            } else {
-                infoDiv.classList.add('show');
-                btn.innerText = '−'; // 展開時變成減號
-            }
-        }
-
-        // 畫面4 -> 畫面5: 送出訂單
-        function submitOrder() {
-            const selectElement = document.getElementById('pickup-time');
-            const selectedTime = selectElement.options[selectElement.selectedIndex].text;
-            
-            document.getElementById('final-time').innerText = selectedTime;
-            document.getElementById('toast-time').innerText = selectedTime;
-            
-            goTo('screen5');
-        }
-
-        // 畫面5 -> 畫面1: 回首頁並觸發動畫提示
-        function returnHome() {
-            goTo('screen1');
-            
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            
-            // 3.5秒後自動隱藏
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
-        }
-    </script>
-</body>
-</html>
+                    <option value="
