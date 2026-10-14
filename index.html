@@ -26,7 +26,6 @@
         .back-btn { font-size: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; user-select: none; color: #333; }
         .center-content { text-align: center; margin-top: 40px; }
         
-        /* 平底鍋插圖 (沒有湯氣) */
         .pan-illustration { width: 150px; height: 100px; margin: 0 auto; position: relative; }
         .pan-handle { position: absolute; width: 60px; height: 10px; background: #333; border-radius: 5px; top: 60px; left: -10px; transform: rotate(15deg); }
         .pan-body { position: absolute; width: 100px; height: 40px; border: 3px solid #333; border-radius: 50%; top: 40px; left: 40px; background: #fff; z-index: 2; }
@@ -50,7 +49,7 @@
         
         .next-btn-circle { position: absolute; bottom: 30px; right: 20px; width: 50px; height: 50px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; background: #fff; user-select: none; }
         
-        /* 畫面4: 取餐時間 */
+        /* 畫面4: 取餐時間 & 畫面5: 付款 */
         .basket-illustration { width: 120px; height: 100px; margin: 30px auto; position: relative; }
         .basket-handle-left { position: absolute; width: 2px; height: 35px; background: #333; top: 0; left: 30px; transform: rotate(-25deg); }
         .basket-handle-right { position: absolute; width: 2px; height: 35px; background: #333; top: 0; right: 30px; transform: rotate(25deg); }
@@ -60,11 +59,11 @@
         .basket-line-v1 { position: absolute; width: 2px; height: 100%; background: #333; left: 33%; }
         .basket-line-v2 { position: absolute; width: 2px; height: 100%; background: #333; left: 66%; }
         
-        .time-select-wrapper { position: relative; width: 80%; margin: 20px auto; }
+        .time-select-wrapper { position: relative; width: 80%; margin: 40px auto; }
         .time-select { 
             width: 100%; 
-            padding: 10px 0; 
-            font-size: 20px; 
+            padding: 15px 0; 
+            font-size: 24px; 
             border: 2px solid #333; 
             text-align: center; 
             text-align-last: center; 
@@ -75,15 +74,14 @@
             cursor: pointer;
             box-sizing: border-box;
         }
-        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #333; font-family: monospace; }
+        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; pointer-events: none; color: #333; font-family: monospace; }
         
-        /* 付款方式 - 移除外框 */
-        .pay-container { width: 80%; margin: 20px auto 40px auto; border: none; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; background: transparent; }
-        .pay-container-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
-        .pay-container label { font-size: 18px; cursor: pointer; display: flex; align-items: center; margin-left: 5px; }
-        .pay-container input { margin-right: 12px; transform: scale(1.2); }
+        .pay-container { width: 80%; margin: 40px auto; border: none; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; background: transparent; }
+        .pay-container-title { font-size: 28px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; }
+        .pay-container label { font-size: 20px; cursor: pointer; display: flex; align-items: center; margin-left: 5px; }
+        .pay-container input { margin-right: 15px; transform: scale(1.5); }
         
-        /* 畫面5: 已送出 */
+        /* 畫面6: 已送出 */
         .success-title { font-size: 28px; margin-bottom: 30px; margin-top: 20px; }
         .details { font-size: 18px; line-height: 2; margin-bottom: 40px; }
         
@@ -105,6 +103,7 @@
 <body>
     <div class="app">
         
+        <!-- 取餐通知動畫 -->
         <div id="toast" class="notification">
             已預約，請於 <span id="toast-time">12:40</span> 取餐！
         </div>
@@ -208,8 +207,9 @@
             <div class="next-btn-circle" onclick="goTo('screen4')">→</div>
         </div>
 
-        <!-- 畫面4: 取餐時間 -->
+        <!-- 畫面4: 取餐時間 (獨立一頁) -->
         <div id="screen4" class="screen">
+            <div class="back-btn" onclick="goTo('screen3')">&lt; 返回</div>
             <div class="basket-illustration">
                 <div class="basket-handle-left"></div>
                 <div class="basket-handle-right"></div>
@@ -223,31 +223,36 @@
             
             <div class="title" style="border: none;">取餐時間？</div>
             
-            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
-                <div class="time-select-wrapper" style="margin: 0; width: 80%;">
-                    <select class="time-select" id="pickup-time">
-                        <option value="12:40">12 : 40</option>
-                        <option value="12:50" selected>12 : 50</option>
-                        <option value="13:00">13 : 00</option>
-                    </select>
-                    <div class="time-select-icon">v</div>
-                </div>
-                
-                <div class="pay-container">
-                    <div class="pay-container-title">
-                        $
-                    </div>
-                    <label><input type="radio" name="pay" value="現金 (現場付款)" checked> 現金 (現場付款)</label>
-                    <label><input type="radio" name="pay" value="Line pay (已付款)"> Line pay</label>
-                    <label><input type="radio" name="pay" value="信用卡 (已付款)"> 信用卡</label>
-                </div>
+            <div class="time-select-wrapper">
+                <select class="time-select" id="pickup-time">
+                    <option value="12:40">12 : 40</option>
+                    <option value="12:50" selected>12 : 50</option>
+                    <option value="13:00">13 : 00</option>
+                </select>
+                <div class="time-select-icon">v</div>
+            </div>
+            
+            <div class="next-btn-circle" onclick="goTo('screen5')">→</div>
+        </div>
+
+        <!-- 畫面5: 付款方式 (獨立一頁) -->
+        <div id="screen5" class="screen">
+            <div class="back-btn" onclick="goTo('screen4')">&lt; 返回修改時間</div>
+            
+            <div class="title" style="border: none; margin-top: 40px;">付款方式？</div>
+            
+            <div class="pay-container">
+                <div class="pay-container-title">$</div>
+                <label><input type="radio" name="pay" value="現金 (現場付款)" checked> 現金 (現場付款)</label>
+                <label><input type="radio" name="pay" value="Line pay (已付款)"> Line pay</label>
+                <label><input type="radio" name="pay" value="信用卡 (已付款)"> 信用卡</label>
             </div>
             
             <div class="next-btn-circle" onclick="submitOrder()">→</div>
         </div>
 
-        <!-- 畫面5: 已送出 -->
-        <div id="screen5" class="screen">
+        <!-- 畫面6: 已送出 (完成畫面) -->
+        <div id="screen6" class="screen">
             <div class="success-title">已送出 ✔</div>
             <div class="details">
                 - 取餐 <span id="final-time">12:50</span><br>
@@ -274,7 +279,6 @@
 
         function filterMenu(category, btnElement) {
             const isAlreadySelected = btnElement.classList.contains('selected');
-            
             document.querySelectorAll('.category-box').forEach(btn => btn.classList.remove('selected'));
             
             if (isAlreadySelected) {
@@ -326,7 +330,7 @@
             
             // 取得選擇的付款方式
             const payOptions = document.getElementsByName('pay');
-            let selectedPay = '';
+            let selectedPay = '現金 (現場付款)'; // 預設防呆
             for (let i = 0; i < payOptions.length; i++) {
                 if (payOptions[i].checked) {
                     selectedPay = payOptions[i].value;
@@ -334,12 +338,13 @@
                 }
             }
             
-            // 更新畫面5與提示框的內容
+            // 把取得的時間跟付款方式寫入到完成畫面(畫面6)
             document.getElementById('final-time').innerText = selectedTime;
             document.getElementById('toast-time').innerText = selectedTime;
             document.getElementById('final-pay').innerText = selectedPay;
             
-            goTo('screen5');
+            // 跳轉至完成畫面
+            goTo('screen6');
         }
 
         function returnHome() {
