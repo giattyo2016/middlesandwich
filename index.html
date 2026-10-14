@@ -26,19 +26,12 @@
         .back-btn { font-size: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; user-select: none; color: #333; }
         .center-content { text-align: center; margin-top: 40px; }
         
-        /* 平底鍋插圖 (CSS繪製) */
-        .pan-illustration { width: 150px; height: 120px; margin: 0 auto; position: relative; }
-        .pan-handle { position: absolute; width: 60px; height: 10px; background: #333; border-radius: 5px; top: 70px; left: -10px; transform: rotate(15deg); }
-        .pan-body { position: absolute; width: 100px; height: 40px; border: 3px solid #333; border-radius: 50%; top: 50px; left: 40px; background: transparent; }
-        .pan-steam1 { position: absolute; font-size: 24px; top: 10px; left: 70px; color: #333; animation: float 2s infinite ease-in-out; }
-        .pan-steam2 { position: absolute; font-size: 20px; top: 20px; left: 90px; color: #333; animation: float 2s infinite ease-in-out 0.5s; }
-        .pan-food { position: absolute; width: 15px; height: 10px; border: 2px solid #333; border-radius: 50%; top: 70px; left: 70px; }
-        .pan-food2 { position: absolute; width: 12px; height: 12px; border: 2px solid #333; top: 65px; left: 90px; transform: rotate(45deg); }
-        
-        @keyframes float {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
-        }
+        /* 平底鍋插圖 (沒有湯氣) */
+        .pan-illustration { width: 150px; height: 100px; margin: 0 auto; position: relative; }
+        .pan-handle { position: absolute; width: 60px; height: 10px; background: #333; border-radius: 5px; top: 60px; left: -10px; transform: rotate(15deg); }
+        .pan-body { position: absolute; width: 100px; height: 40px; border: 3px solid #333; border-radius: 50%; top: 40px; left: 40px; background: #fff; z-index: 2; }
+        .pan-food { position: absolute; width: 15px; height: 10px; border: 2px solid #333; border-radius: 50%; top: 55px; left: 65px; z-index: 3; }
+        .pan-food2 { position: absolute; width: 12px; height: 12px; border: 2px solid #333; top: 52px; left: 88px; transform: rotate(45deg); z-index: 3; }
         
         .big-time { font-size: 32px; font-weight: bold; margin-top: 30px; }
         .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 24px; border-bottom: 2px solid #333; cursor: pointer; user-select: none; padding-bottom: 5px; }
@@ -52,7 +45,6 @@
         .menu-name { margin-left: 15px; font-size: 18px; }
         .plus-btn { font-size: 24px; color: #666; cursor: pointer; user-select: none; padding: 0 15px; }
         
-        /* +按鈕展開的動畫資訊 */
         .menu-info { max-height: 0; overflow: hidden; opacity: 0; background-color: #fafafa; color: #555; font-size: 14px; transition: all 0.3s ease; padding: 0 15px; border-radius: 0 0 8px 8px; }
         .menu-info.show { max-height: 100px; opacity: 1; padding: 10px 15px 15px 15px; border-bottom: 1px solid #ddd; margin-bottom: 10px; }
         
@@ -68,7 +60,6 @@
         .basket-line-v1 { position: absolute; width: 2px; height: 100%; background: #333; left: 33%; }
         .basket-line-v2 { position: absolute; width: 2px; height: 100%; background: #333; left: 66%; }
         
-        /* 時間下拉選單與付款方式的統一外框 */
         .time-select-wrapper { position: relative; width: 80%; margin: 20px auto; }
         .time-select { 
             width: 100%; 
@@ -86,9 +77,10 @@
         }
         .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #333; font-family: monospace; }
         
-        .pay-container { width: 80%; margin: 0 auto 40px auto; border: 2px solid #333; border-top: none; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; background: #fff; }
-        .pay-container-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
-        .pay-container label { font-size: 18px; cursor: pointer; display: flex; align-items: center; }
+        /* 付款方式 - 移除外框 */
+        .pay-container { width: 80%; margin: 20px auto 40px auto; border: none; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; background: transparent; }
+        .pay-container-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
+        .pay-container label { font-size: 18px; cursor: pointer; display: flex; align-items: center; margin-left: 5px; }
         .pay-container input { margin-right: 12px; transform: scale(1.2); }
         
         /* 畫面5: 已送出 */
@@ -158,8 +150,6 @@
             <div style="margin-left: 20px;">🚶🚶🚶...</div>
             <div class="center-content">
                 <div class="pan-illustration">
-                    <div class="pan-steam1">S</div>
-                    <div class="pan-steam2">S</div>
                     <div class="pan-handle"></div>
                     <div class="pan-body"></div>
                     <div class="pan-food"></div>
@@ -173,11 +163,11 @@
         <!-- 畫面3: 預訂 -->
         <div id="screen3" class="screen">
             <div style="text-align: center; margin-bottom: 20px;">
-                <div class="pan-illustration" style="transform: scale(0.6); margin-top: -30px;">
-                    <div class="pan-steam1">S</div>
-                    <div class="pan-steam2">S</div>
+                <div class="pan-illustration" style="transform: scale(0.6); margin-top: -20px;">
                     <div class="pan-handle"></div>
                     <div class="pan-body"></div>
+                    <div class="pan-food"></div>
+                    <div class="pan-food2"></div>
                 </div>
             </div>
             <div style="border: 2px solid #333; display: inline-block; padding: 2px 5px; margin-bottom: 20px;">✔ 預訂</div>
@@ -243,9 +233,9 @@
                     <div class="time-select-icon">v</div>
                 </div>
                 
-                <div class="pay-container" style="margin: 0; width: 80%; border-top: none;">
+                <div class="pay-container">
                     <div class="pay-container-title">
-                        <span style="font-size: 20px; margin-right: 8px;">$</span>
+                        $
                     </div>
                     <label><input type="radio" name="pay" checked> 現金</label>
                     <label><input type="radio" name="pay"> Line pay</label>
@@ -278,7 +268,6 @@
     </div>
 
     <script>
-        // 頁面載入時自動執行排序 (小到大)
         window.onload = function() {
             sortRestaurants();
         };
@@ -286,14 +275,11 @@
         function filterMenu(category, btnElement) {
             const isAlreadySelected = btnElement.classList.contains('selected');
             
-            // 先清除所有按鈕的選中狀態
             document.querySelectorAll('.category-box').forEach(btn => btn.classList.remove('selected'));
             
             if (isAlreadySelected) {
-                // 如果按鈕原本是選中的，再次點擊則取消篩選（顯示全部）
                 document.querySelectorAll('.restaurant-card').forEach(card => card.style.display = 'flex');
             } else {
-                // 如果按鈕未選中，則套用篩選
                 btnElement.classList.add('selected');
                 document.querySelectorAll('.restaurant-card').forEach(card => {
                     if(card.getAttribute('data-category') === category) {
@@ -308,11 +294,7 @@
         function sortRestaurants() {
             const list = document.getElementById('restaurant-list');
             const cards = Array.from(list.querySelectorAll('.restaurant-card'));
-            
-            // 依照時間排序 (小到大)
             cards.sort((a, b) => parseInt(a.getAttribute('data-time')) - parseInt(b.getAttribute('data-time')));
-            
-            // 重新插入DOM
             cards.forEach(card => list.appendChild(card));
         }
 
