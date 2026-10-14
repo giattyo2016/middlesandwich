@@ -237,9 +237,9 @@
                     <div class="pay-container-title">
                         $
                     </div>
-                    <label><input type="radio" name="pay" value="cash" checked> 現金 (現場付款)</label>
-                    <label><input type="radio" name="pay" value="line"> Line pay</label>
-                    <label><input type="radio" name="pay" value="card"> 信用卡</label>
+                    <label><input type="radio" name="pay" value="現金 (現場付款)" checked> 現金 (現場付款)</label>
+                    <label><input type="radio" name="pay" value="Line pay (已付款)"> Line pay</label>
+                    <label><input type="radio" name="pay" value="信用卡 (已付款)"> 信用卡</label>
                 </div>
             </div>
             
@@ -320,30 +320,24 @@
         }
 
         function submitOrder() {
-            // 抓取取餐時間
+            // 取得選擇的時間
             const selectElement = document.getElementById('pickup-time');
             const selectedTime = selectElement.options[selectElement.selectedIndex].text;
             
-            // 抓取付款方式
+            // 取得選擇的付款方式
             const payOptions = document.getElementsByName('pay');
-            let payText = '';
+            let selectedPay = '';
             for (let i = 0; i < payOptions.length; i++) {
                 if (payOptions[i].checked) {
-                    if (payOptions[i].value === 'cash') {
-                        payText = '現金 (現場付款)';
-                    } else if (payOptions[i].value === 'line') {
-                        payText = 'Line pay (已付款)';
-                    } else if (payOptions[i].value === 'card') {
-                        payText = '信用卡 (已付款)';
-                    }
+                    selectedPay = payOptions[i].value;
                     break;
                 }
             }
             
-            // 更新畫面5與提示框的文字
+            // 更新畫面5與提示框的內容
             document.getElementById('final-time').innerText = selectedTime;
             document.getElementById('toast-time').innerText = selectedTime;
-            document.getElementById('final-pay').innerText = payText;
+            document.getElementById('final-pay').innerText = selectedPay;
             
             goTo('screen5');
         }
