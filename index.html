@@ -13,20 +13,22 @@
         
         /* 畫面1: 找餐 */
         .category-container { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .category-box { width: 30%; height: 60px; border: 1px solid #999; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; }
+        .category-box { width: 30%; height: 60px; border: 1px solid #999; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; transition: 0.2s; }
         .category-box.selected { background-color: #ddd; font-weight: bold; }
         
-        .sort-bar { text-align: right; margin-bottom: 15px; color: #1976d2; font-size: 14px; cursor: pointer; font-weight: bold; user-select: none; }
+        /* 排序按鈕 */
+        .sort-bar { text-align: right; margin-bottom: 15px; }
+        .sort-btn { color: #1976d2; font-size: 14px; cursor: pointer; font-weight: bold; user-select: none; display: inline-block; padding: 8px 12px; border-radius: 20px; background: #e3f2fd; transition: 0.2s; }
+        .sort-btn:active { background: #bbdefb; transform: scale(0.95); }
         
         .restaurant-list { display: flex; flex-direction: column; gap: 15px; }
-        /* 初期状態ですべての店舗を表示（display: flex） */
-        .restaurant-card { border: 1px solid #999; border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+        .restaurant-card { border: 1px solid #999; border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; transition: 0.3s; }
         
         /* 畫面2: 目前 12:00 */
         .back-btn { font-size: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; user-select: none; }
         .center-content { text-align: center; margin-top: 40px; }
         
-        /* 平底鍋插圖 (CSS繪製) */
+        /* 平底鍋插圖 */
         .pan-illustration { width: 150px; height: 120px; margin: 0 auto; position: relative; }
         .pan-handle { position: absolute; width: 60px; height: 10px; background: #333; border-radius: 5px; top: 70px; left: -10px; transform: rotate(15deg); }
         .pan-body { position: absolute; width: 100px; height: 40px; border: 3px solid #333; border-radius: 50%; top: 50px; left: 40px; background: transparent; }
@@ -35,10 +37,7 @@
         .pan-food { position: absolute; width: 15px; height: 10px; border: 2px solid #333; border-radius: 50%; top: 70px; left: 70px; }
         .pan-food2 { position: absolute; width: 12px; height: 12px; border: 2px solid #333; top: 65px; left: 90px; transform: rotate(45deg); }
         
-        @keyframes float {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-20px) scale(1.5); opacity: 0; }
-        }
+        @keyframes float { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-20px) scale(1.5); opacity: 0; } }
         
         .big-time { font-size: 32px; font-weight: bold; margin-top: 30px; }
         .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 24px; border-bottom: 2px solid #333; cursor: pointer; user-select: none; padding-bottom: 5px; }
@@ -68,25 +67,10 @@
         .basket-line-v1 { position: absolute; width: 2px; height: 100%; background: #333; left: 33%; }
         .basket-line-v2 { position: absolute; width: 2px; height: 100%; background: #333; left: 66%; }
         
-        /* 時間下拉選單與付款方式的統一外框 */
         .time-select-wrapper { position: relative; width: 80%; margin: 20px auto; }
-        .time-select { 
-            width: 100%; 
-            padding: 10px 0; 
-            font-size: 20px; 
-            border: 2px solid #333; 
-            text-align: center; 
-            text-align-last: center; /* 讓下拉清單與選中文字置中對齊 */
-            background: #fff; 
-            appearance: none; 
-            -webkit-appearance: none; 
-            border-radius: 0; 
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #333; font-family: monospace; }
+        .time-select { width: 100%; padding: 10px 0; font-size: 20px; border: 2px solid #333; text-align: center; text-align-last: center; background: #fff; appearance: none; -webkit-appearance: none; border-radius: 0; cursor: pointer; box-sizing: border-box; }
+        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 18px; pointer-events: none; color: #333; font-weight: bold; }
         
-        /* 與上方時間選單等寬的外框 */
         .pay-container { width: 80%; margin: 0 auto 40px auto; border: 2px solid #333; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; background: #fff; }
         .pay-container-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; }
         .pay-container label { font-size: 18px; cursor: pointer; display: flex; align-items: center; }
@@ -127,28 +111,26 @@
                 <div class="category-box" onclick="filterMenu('drink', this)">飲</div>
             </div>
             
-            <div class="sort-bar" onclick="sortRestaurants()">↓ 等候時間由少到多</div>
+            <div class="sort-bar">
+                <div id="sort-btn" class="sort-btn" onclick="toggleSort()">↓ 等候時間由少到多</div>
+            </div>
             
+            <!-- 預設已依時間由小到大排列 -->
             <div class="restaurant-list" id="restaurant-list">
-                <div class="restaurant-card" data-category="rice" data-time="20" onclick="goToDetail('店1', '20')">
-                    <span>店1</span>
-                    <span>20 min</span>
-                </div>
-                <div class="restaurant-card" data-category="rice" data-time="30" onclick="goToDetail('店2', '30')">
-                    <span>店2</span>
-                    <span>30 min</span>
+                <div class="restaurant-card" data-category="drink" data-time="5" onclick="goToDetail('飲料店', '5')">
+                    <span>飲料店</span><span>5 min</span>
                 </div>
                 <div class="restaurant-card" data-category="noodle" data-time="15" onclick="goToDetail('麵店A', '15')">
-                    <span>麵店A</span>
-                    <span>15 min</span>
+                    <span>麵店A</span><span>15 min</span>
+                </div>
+                <div class="restaurant-card" data-category="rice" data-time="20" onclick="goToDetail('店1', '20')">
+                    <span>店1</span><span>20 min</span>
                 </div>
                 <div class="restaurant-card" data-category="noodle" data-time="25" onclick="goToDetail('麵店B', '25')">
-                    <span>麵店B</span>
-                    <span>25 min</span>
+                    <span>麵店B</span><span>25 min</span>
                 </div>
-                <div class="restaurant-card" data-category="drink" data-time="5" onclick="goToDetail('飲料店', '5')">
-                    <span>飲料店</span>
-                    <span>5 min</span>
+                <div class="restaurant-card" data-category="rice" data-time="30" onclick="goToDetail('店2', '30')">
+                    <span>店2</span><span>30 min</span>
                 </div>
             </div>
         </div>
@@ -234,7 +216,4 @@
             
             <div class="title" style="border: none;">取餐時間？</div>
             
-            <div class="time-select-wrapper">
-                <select class="time-select" id="pickup-time">
-                    <option value="12:40">12 : 40</option>
-                    <option value="
+            <div class="
