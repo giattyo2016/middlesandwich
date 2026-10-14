@@ -5,335 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>學餐等待時間模擬器</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-        }
-        .app-container {
-            width: 100%;
-            max-width: 400px;
-            background-color: #fff;
-            min-height: 100vh;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        header {
-            background-color: #ff9800;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .screen {
-            display: none;
-            padding: 20px;
-        }
-        .screen.active {
-            display: block;
-        }
-        /* 首頁樣式 */
-        .search-bar {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .category-container {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .category-box {
-            width: 30%;
-            height: 60px;
-            background-color: #e0e0e0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9em;
-            color: #555;
-        }
-        .restaurant-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .restaurant-card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .restaurant-info h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.1em;
-        }
-        .restaurant-info p {
-            margin: 0;
-            color: #777;
-            font-size: 0.9em;
-        }
-        .wait-time {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #d32f2f;
-        }
-        /* 詳細與點餐畫面 */
-        .back-btn {
-            background: none;
-            border: none;
-            font-size: 1em;
-            color: #1976d2;
-            cursor: pointer;
-            margin-bottom: 15px;
-            padding: 0;
-        }
-        .detail-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .big-wait-time {
-            font-size: 2em;
-            color: #d32f2f;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .menu-list {
-            margin-bottom: 20px;
-        }
-        .menu-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .add-btn {
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .cart-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-top: 2px solid #ddd;
-            margin-top: 20px;
-        }
-        .checkout-btn {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        /* 結帳畫面 */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-        }
-        .form-group select, .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .confirm-btn {
-            width: 100%;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            font-size: 1.1em;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        /* 完成畫面 */
-        .success-content {
-            text-align: center;
-            margin-top: 50px;
-        }
-        .check-mark {
-            font-size: 4em;
-            color: #4caf50;
-            margin-bottom: 20px;
-        }
-        .home-btn {
-            background-color: #1976d2;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 30px;
-        }
+        body { font-family: sans-serif; background: #f0f0f0; margin: 0; display: flex; justify-content: center; }
+        .app { width: 100%; max-width: 400px; background: #fff; min-height: 100vh; position: relative; }
+        .screen { display: none; padding: 20px; box-sizing: border-box; }
+        .screen.active { display: block; }
+        .title { text-align: center; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        
+        /* 畫面1: 找餐 */
+        .category-container { display: flex; justify-content: space-between; margin-bottom: 30px; }
+        .category-box { width: 30%; height: 60px; border: 1px solid #999; border-radius: 8px; display: flex; justify-content: center; align-items: center; }
+        .restaurant-card { border: 1px solid #999; border-radius: 10px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; cursor: pointer; }
+        
+        /* 畫面2: 目前 12:00 */
+        .back-btn { font-size: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; }
+        .center-content { text-align: center; margin-top: 50px; }
+        .big-time { font-size: 32px; font-weight: bold; margin-top: 20px; }
+        .bottom-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 24px; border-bottom: 2px solid #333; cursor: pointer; }
+        
+        /* 畫面3: 預訂 */
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .checkbox { width: 24px; height: 24px; border: 2px solid #666; border-radius: 4px; display: inline-block; }
+        .menu-name { flex-grow: 1; margin-left: 15px; font-size: 18px; }
+        .plus-btn { font-size: 24px; color: #666; cursor: pointer; }
+        .next-btn-circle { position: absolute; bottom: 20px; right: 20px; width: 50px; height: 50px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; }
+        
+        /* 畫面4: 取餐時間 */
+        .time-select { width: 80%; padding: 10px; font-size: 20px; border: 2px solid #333; margin: 20px auto; display: block; text-align: center; }
+        .pay-options { margin-top: 40px; font-size: 18px; }
+        .pay-options input { margin-right: 10px; }
+        
+        /* 畫面5: 已送出 */
+        .success-title { font-size: 28px; margin-bottom: 30px; }
+        .details { font-size: 18px; line-height: 2; margin-bottom: 40px; }
+        .counter-img { width: 200px; height: 150px; border: 2px solid #ccc; margin: 0 auto; display: flex; justify-content: center; align-items: center; color: #999; }
+        .home-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 24px; cursor: pointer; border: 1px solid #333; padding: 10px 30px; border-radius: 8px; }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <header>學餐等待時間模擬器</header>
-
-    <!-- 畫面 1：首頁 (找餐) -->
-    <div id="screen-home" class="screen active">
-        <input type="text" class="search-bar" placeholder="找餐...">
-        
-        <div class="category-container">
-            <div class="category-box">飯類</div>
-            <div class="category-box">麵類</div>
-            <div class="category-box">飲料</div>
+    <div class="app">
+        <!-- 畫面1: 找餐 -->
+        <div id="screen1" class="screen active">
+            <div class="title">找餐</div>
+            <div class="category-container">
+                <div class="category-box">飯</div>
+                <div class="category-box">麵</div>
+                <div class="category-box">飲</div>
+            </div>
+            <div class="restaurant-card" onclick="goTo('screen2')">
+                <span>店1</span>
+                <span>20 min</span>
+            </div>
+            <div class="restaurant-card" onclick="goTo('screen2')">
+                <span>店2</span>
+                <span>30 min</span>
+            </div>
         </div>
 
-        <div class="restaurant-list">
-            <div class="restaurant-card" onclick="goToDetail('自助餐', '20')">
-                <div class="restaurant-info">
-                    <h3>自助餐</h3>
-                    <p>目前排隊：約 15 人</p>
-                </div>
-                <div class="wait-time">20 min</div>
+        <!-- 畫面2: 目前 12:00 -->
+        <div id="screen2" class="screen">
+            <div class="back-btn" onclick="goTo('screen1')">&lt; 目前 12:00</div>
+            <div>🚶🚶🚶...</div>
+            <div class="center-content">
+                <div style="font-size: 60px;">🍳</div>
+                <div class="big-time">20分鐘...</div>
+            </div>
+            <div class="bottom-btn" onclick="goTo('screen3')">訂餐</div>
+        </div>
+
+        <!-- 畫面3: 預訂 -->
+        <div id="screen3" class="screen">
+            <div style="text-align: center; font-size: 40px; margin-bottom: 20px;">🍳</div>
+            <div style="border: 2px solid #333; display: inline-block; padding: 2px 5px; margin-bottom: 20px;">✔ 預訂</div>
+            
+            <div class="menu-item">
+                <div class="checkbox"></div>
+                <div class="menu-name">料理1</div>
+                <div class="plus-btn" onclick="goTo('screen4')">+</div>
+            </div>
+            <div class="menu-item">
+                <div class="checkbox"></div>
+                <div class="menu-name">料理2</div>
+                <div class="plus-btn" onclick="goTo('screen4')">+</div>
+            </div>
+            <div class="menu-item">
+                <div class="checkbox"></div>
+                <div class="menu-name">料理3</div>
+                <div class="plus-btn" onclick="goTo('screen4')">+</div>
             </div>
             
-            <div class="restaurant-card" onclick="goToDetail('滷味', '30')">
-                <div class="restaurant-info">
-                    <h3>滷味</h3>
-                    <p>目前排隊：約 20 人</p>
+            <div class="next-btn-circle" onclick="goTo('screen4')">→</div>
+        </div>
+
+        <!-- 畫面4: 取餐時間 -->
+        <div id="screen4" class="screen">
+            <div style="text-align: center; margin: 40px 0;">
+                <div style="width: 150px; height: 100px; border: 2px solid #333; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;">
+                    <div style="border-right: 1px solid #333; border-bottom: 1px solid #333;"></div>
+                    <div style="border-bottom: 1px solid #333;"></div>
+                    <div style="border-right: 1px solid #333;"></div>
+                    <div></div>
                 </div>
-                <div class="wait-time">30 min</div>
             </div>
-
-            <div class="restaurant-card" onclick="goToDetail('早餐店', '5')">
-                <div class="restaurant-info">
-                    <h3>早餐店</h3>
-                    <p>目前排隊：約 2 人</p>
-                </div>
-                <div class="wait-time" style="color: #4caf50;">5 min</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 畫面 2：店家詳細與點餐 -->
-    <div id="screen-detail" class="screen">
-        <button class="back-btn" onclick="showScreen('screen-home')">&lt; 返回</button>
-        
-        <div class="detail-header">
-            <h2 id="detail-name">店家名稱</h2>
-            <p>目前 12:00 預估等待時間</p>
-            <div class="big-wait-time" id="detail-time">-- 分鐘</div>
-        </div>
-
-        <h3 style="border-bottom: 2px solid #ff9800; padding-bottom: 5px;">餐點預訂</h3>
-        <div class="menu-list">
-            <div class="menu-item">
-                <span>招牌排骨飯 $80</span>
-                <button class="add-btn">+</button>
-            </div>
-            <div class="menu-item">
-                <span>雞腿飯 $90</span>
-                <button class="add-btn">+</button>
-            </div>
-            <div class="menu-item">
-                <span>控肉飯 $75</span>
-                <button class="add-btn">+</button>
-            </div>
-        </div>
-
-        <div class="cart-footer">
-            <span>已選：1 份餐點</span>
-            <button class="checkout-btn" onclick="showScreen('screen-checkout')">下一步 &rarr;</button>
-        </div>
-    </div>
-
-    <!-- 畫面 3：取餐時間與付款 -->
-    <div id="screen-checkout" class="screen">
-        <button class="back-btn" onclick="showScreen('screen-detail')">&lt; 返回修改</button>
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h2>結帳與設定</h2>
-        </div>
-
-        <div class="form-group">
-            <label>取餐時間？</label>
-            <select>
-                <option>盡快 (依目前等待時間)</option>
-                <option>12:30</option>
-                <option>12:40</option>
-                <option>12:50</option>
+            
+            <div class="title" style="border: none;">取餐時間？</div>
+            <select class="time-select">
+                <option>12 : 40 ✔</option>
+                <option>12 : 50</option>
+                <option>13 : 00</option>
             </select>
-        </div>
-
-        <div class="form-group">
-            <label>付款方式</label>
-            <div>
-                <input type="radio" name="pay" id="cash" checked> <label for="cash" style="display:inline;">現金 (現場)</label><br><br>
-                <input type="radio" name="pay" id="line"> <label for="line" style="display:inline;">LINE Pay</label><br><br>
-                <input type="radio" name="pay" id="card"> <label for="card" style="display:inline;">信用卡</label>
-            </div>
-        </div>
-
-        <button class="confirm-btn" onclick="showScreen('screen-success')">確認送出 &rarr;</button>
-    </div>
-
-    <!-- 畫面 4：完成畫面 -->
-    <div id="screen-success" class="screen">
-        <div class="success-content">
-            <div class="check-mark">✔</div>
-            <h2>已送出！</h2>
-            <p style="font-size: 1.2em; margin: 20px 0;">預計取餐：12:40</p>
-            <p>付款狀態：已付款 (LINE Pay)</p>
             
-            <div style="margin-top: 40px; padding: 20px; background-color: #fff9c4; border-radius: 8px;">
-                <p style="margin:0; font-weight:bold;">已預約提醒</p>
-                <p style="margin:5px 0 0 0; font-size:0.9em;">請於 12:40 前往取餐</p>
+            <div class="pay-options">
+                <span style="font-size: 24px; margin-right: 10px;">$</span>
+                <input type="radio" name="pay" checked> 現金 
+                <input type="radio" name="pay"> Line pay 
+                <input type="radio" name="pay"> 信用卡
             </div>
+            
+            <div class="next-btn-circle" onclick="goTo('screen5')">→</div>
+        </div>
 
-            <button class="home-btn" onclick="showScreen('screen-home')">回首頁</button>
+        <!-- 畫面5: 已送出 -->
+        <div id="screen5" class="screen">
+            <div class="success-title">已送出 ✔</div>
+            <div class="details">
+                - 取餐 12:40<br>
+                - Line pay (已付款)
+            </div>
+            
+            <div class="counter-img">
+                櫃檯/店員插圖...
+            </div>
+            
+            <div class="home-btn" onclick="goTo('screen1')">回首頁</div>
         </div>
     </div>
 
-</div>
-
-<script>
-    function showScreen(screenId) {
-        // 隱藏所有畫面
-        document.querySelectorAll('.screen').forEach(function(screen) {
-            screen.classList.remove('active');
-        });
-        // 顯示指定的畫面
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    function goToDetail(name, time) {
-        document.getElementById('detail-name').innerText = name;
-        document.getElementById('detail-time').innerText = time + ' 分鐘';
-        showScreen('screen-detail');
-    }
-</script>
-
+    <script>
+        function goTo(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+    </script>
 </body>
 </html>
