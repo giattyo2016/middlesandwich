@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學餐</title>
+    <title>學餐等待時間模擬器</title>
     <style>
         /* 全局與背景設定 */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e9ecef; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
@@ -27,15 +27,25 @@
         .sort-bar:active { color: #ff9800; }
         
         .restaurant-list { display: flex; flex-direction: column; gap: 15px; }
-        .restaurant-card { border: 2px solid #fff; border-left: 6px solid #ff9800; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; background: #fff; transition: 0.2s; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
-        .restaurant-card:active { transform: scale(0.98); background: #fff3e0; }
+        .restaurant-card { border: 2px solid #fff; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; background: #fff; transition: 0.2s; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+        .restaurant-card:active { transform: scale(0.98); }
         .restaurant-name { font-size: 18px; font-weight: bold; color: #333; }
-        .restaurant-time { font-size: 18px; font-weight: bold; color: #d32f2f; background: #ffebee; padding: 5px 12px; border-radius: 8px; }
+        .restaurant-time { font-size: 18px; font-weight: bold; padding: 5px 12px; border-radius: 8px; }
+
+        /* 動態顏色設定 (綠: 0-5, 黃: 6-15, 赤: 16+) */
+        .time-green { border-left: 6px solid #4caf50; }
+        .time-green .restaurant-time { background: #e8f5e9; color: #2e7d32; }
+        
+        .time-yellow { border-left: 6px solid #ff9800; }
+        .time-yellow .restaurant-time { background: #fff3e0; color: #ef6c00; }
+        
+        .time-red { border-left: 6px solid #f44336; }
+        .time-red .restaurant-time { background: #ffebee; color: #c62828; }
 
         /* 畫面2: 目前 12:00 */
         .center-content { text-align: center; margin-top: 40px; }
         .big-time { font-size: 36px; font-weight: bold; margin-top: 35px; color: #d32f2f; }
-        .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 22px; font-weight: bold; color: white; background: #ff9800; border: none; padding: 15px 50px; border-radius: 30px; cursor: pointer; user-select: none; box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4); transition: 0.2s; }
+        .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 22px; font-weight: bold; color: white; background: #ff9800; border: none; padding: 15px 50px; border-radius: 30px; cursor: pointer; user-select: none; box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4); transition: 0.2s; white-space: nowrap;}
         .bottom-btn:active { transform: translate(-50%, 2px); box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
 
         /* 彩色平底鍋插圖 */
@@ -84,15 +94,20 @@
 
         /* 畫面6: 已送出 */
         .success-title { font-size: 32px; color: #4caf50; font-weight: bold; margin-bottom: 30px; margin-top: 20px; text-align: center; }
-        .details { font-size: 18px; line-height: 2; margin-bottom: 40px; background: #f1f8e9; padding: 20px; border-radius: 12px; border-left: 5px solid #8bc34a; color: #33691e; font-weight: bold; }
+        .details { font-size: 18px; line-height: 2; margin-bottom: 30px; background: #f1f8e9; padding: 20px; border-radius: 12px; border-left: 5px solid #8bc34a; color: #33691e; font-weight: bold; }
         
-        /* 彩色櫃檯插圖 */
-        .counter-illustration { width: 180px; height: 120px; margin: 40px auto; position: relative; }
-        .counter-sign { position: absolute; width: 140px; height: 25px; background: #4caf50; border: 3px solid #388e3c; border-radius: 5px; top: 0; left: 20px; color: white; text-align: center; font-size: 14px; font-weight: bold; line-height: 25px; }
-        .counter-person-head { position: absolute; width: 28px; height: 28px; background: #ffccbc; border: 2px solid #d84315; border-radius: 50%; top: 35px; left: 76px; }
-        .counter-person-body { position: absolute; width: 24px; height: 20px; background: #1976d2; border-radius: 5px 5px 0 0; top: 65px; left: 78px; }
-        .counter-table { position: absolute; width: 160px; height: 45px; background: #ffe0b2; border: 3px solid #ffb300; border-bottom: none; border-radius: 10px 10px 0 0; bottom: 0; left: 10px; z-index: 5; }
-        .counter-dots { position: absolute; bottom: 15px; right: -25px; font-size: 24px; letter-spacing: 2px; color: #ff9800; font-weight: bold; }
+        /* 照片預定區塊 */
+        .photo-placeholder { width: 250px; height: 150px; background: #e0e0e0; border: 2px dashed #9e9e9e; border-radius: 10px; margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center; color: #757575; font-weight: bold; font-size: 16px; }
+
+        /* 鬧鐘通知開關 */
+        .alarm-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 40px; }
+        .alarm-text { font-size: 16px; font-weight: bold; color: #ff9800; }
+        .toggle-switch { position: relative; width: 50px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #ff9800; }
+        input:checked + .slider:before { transform: translateX(26px); }
 
         .home-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 20px; font-weight: bold; cursor: pointer; background: #2196f3; color: white; border: none; padding: 15px 40px; border-radius: 30px; user-select: none; white-space: nowrap; box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4); transition: 0.2s; }
         .home-btn:active { transform: translate(-50%, 2px); box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4); }
@@ -122,6 +137,7 @@
             <div class="sort-bar" onclick="sortRestaurants()">↓ 等候時間由少到多</div>
             
             <div class="restaurant-list" id="restaurant-list">
+                <!-- 店鋪列表會由 JS 動態生成顏色 -->
                 <div class="restaurant-card" data-category="rice" data-time="20" onclick="goToDetail('店1', '20')">
                     <span class="restaurant-name">店1</span>
                     <span class="restaurant-time">20 min</span>
@@ -180,33 +196,33 @@
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
-                        <div class="menu-name">特製排骨飯</div>
+                        <div class="menu-name">料理1</div>
                     </div>
                     <div class="plus-btn" onclick="toggleInfo('info1')">+</div>
                 </div>
-                <div id="info1" class="menu-info">店長強力推薦，外酥內軟的炸排骨搭配三樣季節配菜，營養滿分。</div>
+                <div id="info1" class="menu-info">料理1的詳細資訊。快速且營養豐富。</div>
             </div>
 
             <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
-                        <div class="menu-name">招牌雞腿飯</div>
+                        <div class="menu-name">料理2</div>
                     </div>
                     <div class="plus-btn" onclick="toggleInfo('info2')">+</div>
                 </div>
-                <div id="info2" class="menu-info">經典熱銷口味，大份量滷雞腿，學生最愛高CP值首選。</div>
+                <div id="info2" class="menu-info">料理2的詳細資訊。經典口味，份量充足。</div>
             </div>
 
             <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
-                        <div class="menu-name">健康鮮蔬餐</div>
+                        <div class="menu-name">飲料1</div>
                     </div>
                     <div class="plus-btn" onclick="toggleInfo('info3')">+</div>
                 </div>
-                <div id="info3" class="menu-info">水煮健康餐盒，適合不想吃太油膩的午後時光，清爽無負擔。</div>
+                <div id="info3" class="menu-info">飲料1的詳細資訊。清涼解渴，最佳搭配。</div>
             </div>
             
             <div class="next-btn-circle" onclick="goTo('screen4')">→</div>
@@ -267,12 +283,17 @@
                 • 付款狀態：<span id="final-pay">現金 (現場付款)</span>
             </div>
             
-            <div class="counter-illustration">
-                <div class="counter-sign">取餐區</div>
-                <div class="counter-person-head"></div>
-                <div class="counter-person-body"></div>
-                <div class="counter-table"></div>
-                <div class="counter-dots">...</div>
+            <!-- 照片插入區與鬧鐘設定 -->
+            <div class="photo-placeholder">
+                (照片插入予定)
+            </div>
+            
+            <div class="alarm-container">
+                <span class="alarm-text">開啟取餐前 5 分鐘通知</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
             </div>
             
             <button class="home-btn" onclick="returnHome()">回首頁</button>
@@ -280,7 +301,26 @@
     </div>
 
     <script>
+        // 根據時間設定顏色
+        function applyTimeColors() {
+            document.querySelectorAll('.restaurant-card').forEach(card => {
+                const time = parseInt(card.getAttribute('data-time'));
+                // 先移除所有顏色 class
+                card.classList.remove('time-green', 'time-yellow', 'time-red');
+                
+                // 根據時間加上對應顏色 class
+                if (time <= 5) {
+                    card.classList.add('time-green');
+                } else if (time >= 6 && time <= 15) {
+                    card.classList.add('time-yellow');
+                } else {
+                    card.classList.add('time-red');
+                }
+            });
+        }
+
         window.onload = function() {
+            applyTimeColors();
             sortRestaurants();
         };
 
