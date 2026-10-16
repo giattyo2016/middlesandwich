@@ -3,100 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學餐等待時間模擬器</title>
+    <title>學餐</title>
     <style>
-        body { font-family: sans-serif; background: #f0f0f0; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
-        .app { width: 100%; max-width: 400px; height: 100vh; max-height: 850px; background: #fff; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.1); overflow-y: auto; overflow-x: hidden; }
+        /* 全局與背景設定 */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e9ecef; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        .app { width: 100%; max-width: 400px; height: 100vh; max-height: 850px; background: #fffcf9; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow-y: auto; overflow-x: hidden; }
         .screen { display: none; padding: 20px; box-sizing: border-box; min-height: 100%; position: relative; }
-        .screen.active { display: block; }
-        .title { text-align: center; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         
-        /* 畫面1: 找餐 */
-        .category-container { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .category-box { width: 30%; height: 60px; border: 1px solid #999; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; transition: 0.2s; background: #fff; }
-        .category-box.selected { background-color: #ddd; font-weight: bold; border-color: #333; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 標題與返回按鈕 */
+        .title { text-align: center; font-size: 26px; margin-bottom: 25px; color: #e65100; font-weight: bold; padding-bottom: 15px; border-bottom: 3px dashed #ffcc80; }
+        .back-btn { font-size: 18px; cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; color: #1976d2; font-weight: bold; background: #e3f2fd; padding: 8px 15px; border-radius: 20px; user-select: none; transition: 0.2s; }
+        .back-btn:active { background: #bbdefb; }
+
+        /* 畫面1: 找餐 (分類與卡片) */
+        .category-container { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
+        .category-box { flex: 1; height: 55px; border: 2px solid #ffe0b2; background: #fff; color: #e65100; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; user-select: none; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .category-box.selected { background-color: #ff9800; color: white; border-color: #ff9800; font-weight: bold; box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3); }
         
-        .sort-bar { text-align: right; margin-bottom: 15px; color: #1976d2; font-size: 14px; cursor: pointer; font-weight: bold; user-select: none; padding: 5px 0; }
+        .sort-bar { text-align: right; margin-bottom: 15px; color: #757575; font-size: 14px; cursor: pointer; font-weight: bold; user-select: none; padding: 5px 0; transition: 0.2s; }
+        .sort-bar:active { color: #ff9800; }
         
         .restaurant-list { display: flex; flex-direction: column; gap: 15px; }
-        .restaurant-card { border: 1px solid #999; border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; background: #fff; transition: 0.2s; }
-        .restaurant-card:active { background: #f5f5f5; }
-        
+        .restaurant-card { border: 2px solid #fff; border-left: 6px solid #ff9800; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; cursor: pointer; align-items: center; background: #fff; transition: 0.2s; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+        .restaurant-card:active { transform: scale(0.98); background: #fff3e0; }
+        .restaurant-name { font-size: 18px; font-weight: bold; color: #333; }
+        .restaurant-time { font-size: 18px; font-weight: bold; color: #d32f2f; background: #ffebee; padding: 5px 12px; border-radius: 8px; }
+
         /* 畫面2: 目前 12:00 */
-        .back-btn { font-size: 20px; cursor: pointer; margin-bottom: 20px; display: inline-block; user-select: none; color: #333; }
         .center-content { text-align: center; margin-top: 40px; }
-        
+        .big-time { font-size: 36px; font-weight: bold; margin-top: 35px; color: #d32f2f; }
+        .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 22px; font-weight: bold; color: white; background: #ff9800; border: none; padding: 15px 50px; border-radius: 30px; cursor: pointer; user-select: none; box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4); transition: 0.2s; }
+        .bottom-btn:active { transform: translate(-50%, 2px); box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
+
+        /* 彩色平底鍋插圖 */
         .pan-illustration { width: 150px; height: 100px; margin: 0 auto; position: relative; }
-        .pan-handle { position: absolute; width: 60px; height: 10px; background: #333; border-radius: 5px; top: 60px; left: -10px; transform: rotate(15deg); }
-        .pan-body { position: absolute; width: 100px; height: 40px; border: 3px solid #333; border-radius: 50%; top: 40px; left: 40px; background: #fff; z-index: 2; }
-        .pan-food { position: absolute; width: 15px; height: 10px; border: 2px solid #333; border-radius: 50%; top: 55px; left: 65px; z-index: 3; }
-        .pan-food2 { position: absolute; width: 12px; height: 12px; border: 2px solid #333; top: 52px; left: 88px; transform: rotate(45deg); z-index: 3; }
-        
-        .big-time { font-size: 32px; font-weight: bold; margin-top: 30px; }
-        .bottom-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 24px; border-bottom: 2px solid #333; cursor: pointer; user-select: none; padding-bottom: 5px; }
-        
+        .pan-handle { position: absolute; width: 70px; height: 12px; background: #5d4037; border-radius: 6px; top: 60px; left: -20px; transform: rotate(15deg); }
+        .pan-body { position: absolute; width: 100px; height: 40px; background: #37474f; border-bottom: 5px solid #263238; border-radius: 50%; top: 40px; left: 40px; z-index: 2; box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3); }
+        .pan-food { position: absolute; width: 20px; height: 15px; background: #ffca28; border-radius: 50%; top: 52px; left: 65px; z-index: 3; box-shadow: 2px 2px 0 #ff8f00; }
+        .pan-food2 { position: absolute; width: 15px; height: 15px; background: #ef5350; top: 48px; left: 95px; transform: rotate(45deg); z-index: 3; box-shadow: 2px 2px 0 #c62828; }
+
         /* 畫面3: 預訂 */
-        .menu-item-group { border-bottom: 1px solid #eee; }
-        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; }
+        .order-badge { background: #fff3e0; color: #e65100; font-weight: bold; border-radius: 8px; display: inline-block; padding: 8px 15px; margin-bottom: 20px; border: 2px solid #ffcc80; }
+        .menu-item-group { border-bottom: 1px solid #f0f0f0; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; }
         .checkbox-container { display: flex; align-items: center; cursor: pointer; flex-grow: 1; }
-        .custom-checkbox { width: 24px; height: 24px; border: 2px solid #666; border-radius: 4px; display: inline-flex; justify-content: center; align-items: center; font-size: 18px; color: transparent; transition: 0.2s; }
-        .custom-checkbox.checked { color: #333; }
-        .menu-name { margin-left: 15px; font-size: 18px; }
-        .plus-btn { font-size: 24px; color: #666; cursor: pointer; user-select: none; padding: 0 15px; }
+        .custom-checkbox { width: 26px; height: 26px; border: 2px solid #ffb74d; border-radius: 6px; display: inline-flex; justify-content: center; align-items: center; font-size: 18px; color: transparent; transition: 0.2s; background: #fff; }
+        .custom-checkbox.checked { background: #4caf50; border-color: #4caf50; color: #fff; }
+        .menu-name { margin-left: 15px; font-size: 18px; color: #333; font-weight: bold; }
+        .plus-btn { font-size: 22px; color: #ff9800; background: #fff3e0; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; transition: 0.2s; }
+        .plus-btn:active { background: #ffe0b2; }
         
-        .menu-info { max-height: 0; overflow: hidden; opacity: 0; background-color: #fafafa; color: #555; font-size: 14px; transition: all 0.3s ease; padding: 0 15px; border-radius: 0 0 8px 8px; }
-        .menu-info.show { max-height: 100px; opacity: 1; padding: 10px 15px 15px 15px; border-bottom: 1px solid #ddd; margin-bottom: 10px; }
+        .menu-info { max-height: 0; overflow: hidden; opacity: 0; background-color: #fafafa; color: #666; font-size: 14px; transition: all 0.3s ease; padding: 0 15px; border-radius: 0 0 8px 8px; line-height: 1.5; }
+        .menu-info.show { max-height: 100px; opacity: 1; padding: 10px 15px 15px 15px; border-bottom: 1px solid #eee; margin-bottom: 10px; }
         
-        .next-btn-circle { position: absolute; bottom: 30px; right: 20px; width: 50px; height: 50px; border: 2px solid #333; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; background: #fff; user-select: none; }
-        
+        .next-btn-circle { position: absolute; bottom: 30px; right: 25px; width: 60px; height: 60px; background: #ff9800; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; cursor: pointer; user-select: none; box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4); transition: 0.2s; }
+        .next-btn-circle:active { transform: translateY(2px); box-shadow: 0 2px 8px rgba(255, 152, 0, 0.4); }
+
         /* 畫面4: 取餐時間 & 畫面5: 付款 */
+        /* 彩色購物籃插圖 */
         .basket-illustration { width: 120px; height: 100px; margin: 30px auto; position: relative; }
-        .basket-handle-left { position: absolute; width: 2px; height: 35px; background: #333; top: 0; left: 30px; transform: rotate(-25deg); }
-        .basket-handle-right { position: absolute; width: 2px; height: 35px; background: #333; top: 0; right: 30px; transform: rotate(25deg); }
-        .basket-handle-top { position: absolute; width: 70px; height: 2px; background: #333; top: 0; left: 25px; }
-        .basket-body { position: absolute; width: 100px; height: 50px; border: 2px solid #333; bottom: 10px; left: 10px; }
-        .basket-line-h { position: absolute; width: 100%; height: 2px; background: #333; top: 50%; }
-        .basket-line-v1 { position: absolute; width: 2px; height: 100%; background: #333; left: 33%; }
-        .basket-line-v2 { position: absolute; width: 2px; height: 100%; background: #333; left: 66%; }
-        
-        .time-select-wrapper { position: relative; width: 80%; margin: 40px auto; }
-        .time-select { 
-            width: 100%; 
-            padding: 15px 0; 
-            font-size: 24px; 
-            border: 2px solid #333; 
-            text-align: center; 
-            text-align-last: center; 
-            background: #fff; 
-            appearance: none; 
-            -webkit-appearance: none; 
-            border-radius: 0; 
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        .time-select-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 20px; pointer-events: none; color: #333; font-family: monospace; }
-        
-        .pay-container { width: 80%; margin: 40px auto; border: none; padding: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; background: transparent; }
-        .pay-container-title { font-size: 28px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; }
-        .pay-container label { font-size: 20px; cursor: pointer; display: flex; align-items: center; margin-left: 5px; }
-        .pay-container input { margin-right: 15px; transform: scale(1.5); }
-        
+        .basket-handle-left { position: absolute; width: 4px; height: 35px; background: #1e88e5; top: 0; left: 30px; transform: rotate(-25deg); border-radius: 2px; }
+        .basket-handle-right { position: absolute; width: 4px; height: 35px; background: #1e88e5; top: 0; right: 30px; transform: rotate(25deg); border-radius: 2px; }
+        .basket-handle-top { position: absolute; width: 70px; height: 4px; background: #1e88e5; top: 0; left: 25px; border-radius: 2px; }
+        .basket-body { position: absolute; width: 100px; height: 50px; background: #e3f2fd; border: 3px solid #1e88e5; bottom: 10px; left: 10px; border-radius: 5px 5px 15px 15px; overflow: hidden; }
+        .basket-line-h { position: absolute; width: 100%; height: 3px; background: #1e88e5; top: 50%; }
+        .basket-line-v1 { position: absolute; width: 3px; height: 100%; background: #1e88e5; left: 33%; }
+        .basket-line-v2 { position: absolute; width: 3px; height: 100%; background: #1e88e5; left: 66%; }
+
+        .time-select-wrapper { position: relative; width: 85%; margin: 30px auto; }
+        .time-select { width: 100%; padding: 15px 0; font-size: 24px; font-weight: bold; color: #333; border: 2px solid #ff9800; border-radius: 12px; text-align: center; text-align-last: center; background: #fff; appearance: none; -webkit-appearance: none; cursor: pointer; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); outline: none; }
+        .time-select-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 20px; pointer-events: none; color: #ff9800; font-weight: bold; }
+
+        .pay-container { width: 85%; margin: 30px auto; background: #fff3e0; border-radius: 15px; padding: 25px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
+        .pay-container-title { font-size: 24px; font-weight: bold; margin-bottom: 5px; color: #e65100; display: flex; align-items: center; }
+        .pay-container label { font-size: 18px; color: #424242; cursor: pointer; display: flex; align-items: center; font-weight: bold; padding: 5px 0; }
+        .pay-container input[type="radio"] { margin-right: 15px; width: 20px; height: 20px; accent-color: #ff9800; }
+
         /* 畫面6: 已送出 */
-        .success-title { font-size: 28px; margin-bottom: 30px; margin-top: 20px; }
-        .details { font-size: 18px; line-height: 2; margin-bottom: 40px; }
+        .success-title { font-size: 32px; color: #4caf50; font-weight: bold; margin-bottom: 30px; margin-top: 20px; text-align: center; }
+        .details { font-size: 18px; line-height: 2; margin-bottom: 40px; background: #f1f8e9; padding: 20px; border-radius: 12px; border-left: 5px solid #8bc34a; color: #33691e; font-weight: bold; }
         
+        /* 彩色櫃檯插圖 */
         .counter-illustration { width: 180px; height: 120px; margin: 40px auto; position: relative; }
-        .counter-sign { position: absolute; width: 140px; height: 20px; border: 2px solid #333; top: 0; left: 20px; }
-        .counter-person-head { position: absolute; width: 24px; height: 24px; border: 2px solid #333; border-radius: 50%; top: 35px; left: 78px; }
-        .counter-person-body { position: absolute; width: 2px; height: 15px; background: #333; top: 60px; left: 90px; }
-        .counter-person-arm { position: absolute; width: 20px; height: 2px; background: #333; top: 65px; left: 70px; transform: rotate(20deg); }
-        .counter-table { position: absolute; width: 160px; height: 40px; border: 2px solid #333; border-bottom: none; border-radius: 10px 10px 0 0; bottom: 0; left: 10px; background: #fff; }
-        .counter-dots { position: absolute; bottom: 10px; right: -20px; font-size: 20px; letter-spacing: 2px; }
-        
-        .home-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 20px; cursor: pointer; border: 1px solid #333; padding: 10px 30px; border-radius: 8px; user-select: none; white-space: nowrap; }
-        
+        .counter-sign { position: absolute; width: 140px; height: 25px; background: #4caf50; border: 3px solid #388e3c; border-radius: 5px; top: 0; left: 20px; color: white; text-align: center; font-size: 14px; font-weight: bold; line-height: 25px; }
+        .counter-person-head { position: absolute; width: 28px; height: 28px; background: #ffccbc; border: 2px solid #d84315; border-radius: 50%; top: 35px; left: 76px; }
+        .counter-person-body { position: absolute; width: 24px; height: 20px; background: #1976d2; border-radius: 5px 5px 0 0; top: 65px; left: 78px; }
+        .counter-table { position: absolute; width: 160px; height: 45px; background: #ffe0b2; border: 3px solid #ffb300; border-bottom: none; border-radius: 10px 10px 0 0; bottom: 0; left: 10px; z-index: 5; }
+        .counter-dots { position: absolute; bottom: 15px; right: -25px; font-size: 24px; letter-spacing: 2px; color: #ff9800; font-weight: bold; }
+
+        .home-btn { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 20px; font-weight: bold; cursor: pointer; background: #2196f3; color: white; border: none; padding: 15px 40px; border-radius: 30px; user-select: none; white-space: nowrap; box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4); transition: 0.2s; }
+        .home-btn:active { transform: translate(-50%, 2px); box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4); }
+
         /* 提示動畫 */
-        .notification { position: absolute; top: 20px; right: -350px; background: #fff9c4; border: 1px solid #fbc02d; padding: 15px; border-radius: 8px 0 0 8px; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100; font-size: 16px; font-weight: bold; color: #333; }
+        .notification { position: absolute; top: 20px; right: -350px; background: #4caf50; color: white; padding: 15px 20px; border-radius: 8px 0 0 8px; box-shadow: -2px 4px 10px rgba(0,0,0,0.2); transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100; font-size: 16px; font-weight: bold; }
         .notification.show { right: 0; }
     </style>
 </head>
@@ -105,7 +107,7 @@
         
         <!-- 取餐通知動畫 -->
         <div id="toast" class="notification">
-            已預約，請於 <span id="toast-time">12:40</span> 取餐！
+            ✔ 已預約，請於 <span id="toast-time">12:40</span> 取餐！
         </div>
 
         <!-- 畫面1: 找餐 -->
@@ -121,32 +123,32 @@
             
             <div class="restaurant-list" id="restaurant-list">
                 <div class="restaurant-card" data-category="rice" data-time="20" onclick="goToDetail('店1', '20')">
-                    <span>店1</span>
-                    <span>20 min</span>
+                    <span class="restaurant-name">店1</span>
+                    <span class="restaurant-time">20 min</span>
                 </div>
                 <div class="restaurant-card" data-category="rice" data-time="30" onclick="goToDetail('店2', '30')">
-                    <span>店2</span>
-                    <span>30 min</span>
+                    <span class="restaurant-name">店2</span>
+                    <span class="restaurant-time">30 min</span>
                 </div>
                 <div class="restaurant-card" data-category="noodle" data-time="15" onclick="goToDetail('麵店A', '15')">
-                    <span>麵店A</span>
-                    <span>15 min</span>
+                    <span class="restaurant-name">麵店A</span>
+                    <span class="restaurant-time">15 min</span>
                 </div>
                 <div class="restaurant-card" data-category="noodle" data-time="25" onclick="goToDetail('麵店B', '25')">
-                    <span>麵店B</span>
-                    <span>25 min</span>
+                    <span class="restaurant-name">麵店B</span>
+                    <span class="restaurant-time">25 min</span>
                 </div>
                 <div class="restaurant-card" data-category="drink" data-time="5" onclick="goToDetail('飲料店', '5')">
-                    <span>飲料店</span>
-                    <span>5 min</span>
+                    <span class="restaurant-name">飲料店</span>
+                    <span class="restaurant-time">5 min</span>
                 </div>
             </div>
         </div>
 
         <!-- 畫面2: 目前 12:00 -->
         <div id="screen2" class="screen">
-            <div class="back-btn" onclick="goTo('screen1')">&lt; 目前 12:00</div>
-            <div style="margin-left: 20px;">🚶🚶🚶...</div>
+            <div class="back-btn" onclick="goTo('screen1')">&lt; 返回找餐</div>
+            <div style="margin-left: 20px; font-size: 20px; color: #555; font-weight: bold;">目前 12:00 🚶🚶🚶...</div>
             <div class="center-content">
                 <div class="pan-illustration">
                     <div class="pan-handle"></div>
@@ -156,58 +158,61 @@
                 </div>
                 <div class="big-time" id="detail-wait-time">20分鐘...</div>
             </div>
-            <div class="bottom-btn" onclick="goTo('screen3')">訂餐</div>
+            <button class="bottom-btn" onclick="goTo('screen3')">開始訂餐</button>
         </div>
 
         <!-- 畫面3: 預訂 -->
         <div id="screen3" class="screen">
+            <div class="back-btn" onclick="goTo('screen2')">&lt; 返回</div>
             <div style="text-align: center; margin-bottom: 20px;">
-                <div class="pan-illustration" style="transform: scale(0.6); margin-top: -20px;">
+                <div class="pan-illustration" style="transform: scale(0.7); margin-top: -10px;">
                     <div class="pan-handle"></div>
                     <div class="pan-body"></div>
                     <div class="pan-food"></div>
                     <div class="pan-food2"></div>
                 </div>
             </div>
-            <div style="border: 2px solid #333; display: inline-block; padding: 2px 5px; margin-bottom: 20px;">✔ 預訂</div>
+            <div style="text-align: center;">
+                <div class="order-badge">✔ 餐點預訂</div>
+            </div>
             
             <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
-                        <div class="menu-name">料理1</div>
+                        <div class="menu-name">特製排骨飯</div>
                     </div>
                     <div class="plus-btn" onclick="toggleInfo('info1')">+</div>
                 </div>
-                <div id="info1" class="menu-info">這是一份美味的餐點，快速且營養豐富。</div>
+                <div id="info1" class="menu-info">店長強力推薦，外酥內軟的炸排骨搭配三樣季節配菜，營養滿分。</div>
             </div>
 
             <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
-                        <div class="menu-name">料理2</div>
+                        <div class="menu-name">招牌雞腿飯</div>
                     </div>
                     <div class="plus-btn" onclick="toggleInfo('info2')">+</div>
                 </div>
-                <div id="info2" class="menu-info">經典口味，份量充足，學生最愛推薦。</div>
+                <div id="info2" class="menu-info">經典熱銷口味，大份量滷雞腿，學生最愛高CP值首選。</div>
             </div>
 
             <div class="menu-item-group">
                 <div class="menu-item">
                     <div class="checkbox-container" onclick="toggleCheck(this)">
                         <div class="custom-checkbox">✔</div>
-                        <div class="menu-name">料理3</div>
+                        <div class="menu-name">健康鮮蔬餐</div>
                     </div>
                     <div class="plus-btn" onclick="toggleInfo('info3')">+</div>
                 </div>
-                <div id="info3" class="menu-info">輕食選擇，適合不想吃太飽的午後時光。</div>
+                <div id="info3" class="menu-info">水煮健康餐盒，適合不想吃太油膩的午後時光，清爽無負擔。</div>
             </div>
             
             <div class="next-btn-circle" onclick="goTo('screen4')">→</div>
         </div>
 
-        <!-- 畫面4: 取餐時間 (獨立一頁) -->
+        <!-- 畫面4: 取餐時間 -->
         <div id="screen4" class="screen">
             <div class="back-btn" onclick="goTo('screen3')">&lt; 返回</div>
             <div class="basket-illustration">
@@ -221,7 +226,7 @@
                 </div>
             </div>
             
-            <div class="title" style="border: none;">取餐時間？</div>
+            <div class="title" style="border: none; margin-bottom: 0;">選擇取餐時間</div>
             
             <div class="time-select-wrapper">
                 <select class="time-select" id="pickup-time">
@@ -229,20 +234,23 @@
                     <option value="12:50" selected>12 : 50</option>
                     <option value="13:00">13 : 00</option>
                 </select>
-                <div class="time-select-icon">v</div>
+                <div class="time-select-icon">▼</div>
             </div>
             
             <div class="next-btn-circle" onclick="goTo('screen5')">→</div>
         </div>
 
-        <!-- 畫面5: 付款方式 (獨立一頁) -->
+        <!-- 畫面5: 付款方式 -->
         <div id="screen5" class="screen">
             <div class="back-btn" onclick="goTo('screen4')">&lt; 返回修改時間</div>
             
-            <div class="title" style="border: none; margin-top: 40px;">付款方式？</div>
+            <div class="title" style="border: none; margin-top: 20px;">選擇付款方式</div>
             
             <div class="pay-container">
-                <div class="pay-container-title">$</div>
+                <div class="pay-container-title">
+                    <span style="background: #ff9800; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; margin-right: 10px;">$</span>
+                    結帳
+                </div>
                 <label><input type="radio" name="pay" value="現金 (現場付款)" checked> 現金 (現場付款)</label>
                 <label><input type="radio" name="pay" value="Line pay (已付款)"> Line pay</label>
                 <label><input type="radio" name="pay" value="信用卡 (已付款)"> 信用卡</label>
@@ -251,24 +259,23 @@
             <div class="next-btn-circle" onclick="submitOrder()">→</div>
         </div>
 
-        <!-- 畫面6: 已送出 (完成畫面) -->
+        <!-- 畫面6: 已送出 -->
         <div id="screen6" class="screen">
-            <div class="success-title">已送出 ✔</div>
+            <div class="success-title">✔ 訂單已送出</div>
             <div class="details">
-                - 取餐 <span id="final-time">12:50</span><br>
-                - <span id="final-pay">現金 (現場付款)</span>
+                • 預計取餐：<span id="final-time">12:50</span><br>
+                • 付款狀態：<span id="final-pay">現金 (現場付款)</span>
             </div>
             
             <div class="counter-illustration">
-                <div class="counter-sign"></div>
+                <div class="counter-sign">取餐區</div>
                 <div class="counter-person-head"></div>
                 <div class="counter-person-body"></div>
-                <div class="counter-person-arm"></div>
                 <div class="counter-table"></div>
                 <div class="counter-dots">...</div>
             </div>
             
-            <div class="home-btn" onclick="returnHome()">回首頁</div>
+            <button class="home-btn" onclick="returnHome()">回首頁</button>
         </div>
     </div>
 
@@ -310,6 +317,9 @@
 
         function goToDetail(name, time) {
             document.getElementById('detail-wait-time').innerText = time + '分鐘...';
+            // 清空所有已勾選的餐點和展開的介紹
+            document.querySelectorAll('.custom-checkbox').forEach(cb => cb.classList.remove('checked'));
+            document.querySelectorAll('.menu-info').forEach(info => info.classList.remove('show'));
             goTo('screen2');
         }
 
@@ -330,7 +340,7 @@
             
             // 取得選擇的付款方式
             const payOptions = document.getElementsByName('pay');
-            let selectedPay = '現金 (現場付款)'; // 預設防呆
+            let selectedPay = '現金 (現場付款)'; 
             for (let i = 0; i < payOptions.length; i++) {
                 if (payOptions[i].checked) {
                     selectedPay = payOptions[i].value;
@@ -338,12 +348,11 @@
                 }
             }
             
-            // 把取得的時間跟付款方式寫入到完成畫面(畫面6)
+            // 更新畫面6與提示框
             document.getElementById('final-time').innerText = selectedTime;
             document.getElementById('toast-time').innerText = selectedTime;
             document.getElementById('final-pay').innerText = selectedPay;
             
-            // 跳轉至完成畫面
             goTo('screen6');
         }
 
