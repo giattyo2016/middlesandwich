@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學餐等待時間模擬器</title>
+    <title>學餐</title>
     <style>
         /* 全局與背景設定 */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e9ecef; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
@@ -129,7 +129,6 @@
             <div class="sort-bar" onclick="sortRestaurants()">↓ 等候時間由少到多</div>
             
             <div class="restaurant-list" id="restaurant-list">
-                <!-- 店鋪列表會由 JS 動態生成顏色 -->
                 <div class="restaurant-card" data-category="rice" data-time="20" onclick="goToDetail('店1', '20')">
                     <span class="restaurant-name">店1</span>
                     <span class="restaurant-time">20 min</span>
@@ -211,7 +210,7 @@
                 <div id="info3" class="menu-info">飲料1的詳細資訊。清涼解渴，最佳搭配。</div>
             </div>
             
-            <div class="next-btn-circle" onclick="goTo('screen4')">→</div>
+            <div class="next-btn-circle" onclick="prepareScreen4()">→</div>
         </div>
 
         <!-- 畫面4: 取餐時間 -->
@@ -224,11 +223,8 @@
             <div class="title" style="border: none; margin-bottom: 0;">選擇取餐時間</div>
             
             <div class="time-select-wrapper">
+                <!-- 時間選項將由 JavaScript 動態生成 -->
                 <select class="time-select" id="pickup-time">
-                    <option value="12:10" selected>12 : 10</option>
-                    <option value="12:20">12 : 20</option>
-                    <option value="12:30">12 : 30</option>
-                    <option value="12:40">12 : 40</option>
                 </select>
                 <div class="time-select-icon">▼</div>
             </div>
@@ -259,7 +255,7 @@
         <div id="screen6" class="screen">
             <div class="success-title">✔ 訂單已送出</div>
             <div class="details">
-                • 預計取餐：<span id="final-time">12:10</span><br>
+                • 預計取餐：<span id="final-time">--:--</span><br>
                 • 付款狀態：<span id="final-pay">現金 (現場付款)</span>
             </div>
             
@@ -281,14 +277,14 @@
     </div>
 
     <script>
+        // 儲存當前點擊的店家的等待時間
+        let currentWaitTime = 0;
+
         // 根據時間設定顏色
         function applyTimeColors() {
             document.querySelectorAll('.restaurant-card').forEach(card => {
                 const time = parseInt(card.getAttribute('data-time'));
-                // 先移除所有顏色 class
                 card.classList.remove('time-green', 'time-yellow', 'time-red');
-                
-                // 根據時間加上對應顏色 class
                 if (time <= 5) {
                     card.classList.add('time-green');
                 } else if (time >= 6 && time <= 15) {
@@ -336,6 +332,7 @@
         }
 
         function goToDetail(name, time) {
+            currentWaitTime = parseInt(time); // 記錄點擊店家的等待時間
             document.getElementById('detail-wait-time').innerText = time + '分鐘...';
             // 清空所有已勾選的餐點和展開的介紹
             document.querySelectorAll('.custom-checkbox').forEach(cb => cb.classList.remove('checked'));
@@ -351,6 +348,40 @@
         function toggleInfo(infoId) {
             const infoDiv = document.getElementById(infoId);
             infoDiv.classList.toggle('show');
+        }
+
+        // 準備進入畫面4 (動態生成時間下拉選單)
+        function prepareScreen4() {
+            const selectElement = document.getElementById('pickup-time');
+            selectElement.innerHTML = ''; // 清空先前的選項
+
+            // 基準時間為 12:00，換算成總分鐘數 (12 * 60 = 720 分鐘)
+            const baseTimeMinutes = 720; 
+            // 預設取餐時間 = 12:00 + 店家的等待時間
+            const defaultTimeMinutes = baseTimeMinutes + currentWaitTime;
+
+            // 產生 6 個選項，每 5 分鐘一個間距
+            for (let i = 0; i < 6; i++) {
+                let optionMinutes = defaultTimeMinutes + (i * 5);
+                let h = Math.floor(optionMinutes / 60);
+                let m = optionMinutes % 60;
+                
+                // 格式化為 HH:MM，如果分鐘小於 10 則補 0
+                let timeStr = h + ':' + (m < 10 ? '0' + m : m);
+                let displayStr = h + ' : ' + (m < 10 ? '0' + m : m);
+
+                let option = document.createElement('option');
+                option.value = timeStr;
+                option.text = displayStr;
+                
+                // 第一個選項設為預設選中
+                if (i === 0) {
+                    option.selected = true; 
+                }
+                selectElement.appendChild(option);
+            }
+            
+            goTo('screen4');
         }
 
         function submitOrder() {
